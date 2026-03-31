@@ -1,25 +1,242 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>大学专业与就业前景</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>志愿填报专业助手</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #f5f9fc;
+      color: #1f2d3d;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 12px;
+      color: #133b5c;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #5b6b7a;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    input {
+      width: 420px;
+      max-width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #c9d8e6;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #4f9ecf;
+      box-shadow: 0 0 0 3px rgba(79, 158, 207, 0.12);
+    }
+
+    button {
+      padding: 14px 22px;
+      border: none;
+      border-radius: 12px;
+      background: #4f9ecf;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #3f8fbe;
+    }
+
+    .tips {
+      text-align: center;
+      color: #7a8a99;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 8px 24px rgba(18, 60, 90, 0.08);
+      line-height: 1.8;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      color: #133b5c;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #eaf4fb;
+      color: #246b9a;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      margin-top: 20px;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #2d4b66;
+    }
+
+    .empty {
+      background: white;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 8px 24px rgba(18, 60, 90, 0.08);
+      text-align: center;
+      color: #6d7b88;
+    }
+
+    .footer-note {
+      margin-top: 24px;
+      font-size: 13px;
+      color: #7a8a99;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 600px) {
+      .search-box {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      input,
+      button {
+        width: 100%;
+      }
+
+      .card,
+      .empty {
+        padding: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1>欢迎来到大学专业信息平台</h1>
-    <p>这里可以帮助你了解各类大学专业的薪资与就业前景。</p>
+  <div class="container">
+    <h1>志愿填报专业助手</h1>
+    <p class="subtitle">
+      输入你想了解的专业名称，查看这个专业学什么、能做什么、就业前景如何。
+    </p>
 
-    <input type="text" id="majorInput" placeholder="输入专业名...">
-    <button onclick="searchMajor()">查询专业</button>
+    <div class="search-box">
+      <input
+        type="text"
+        id="majorInput"
+        placeholder="例如：计算机科学与技术 / 法学 / 会计学"
+      />
+      <button onclick="searchMajor()">查询专业</button>
+    </div>
 
-    <div id="result"></div>
+    <div class="tips">
+      可尝试搜索：计算机科学与技术、法学、金融学、临床医学、视觉传达设计
+    </div>
 
-    <script>
-      function searchMajor() {
-        const major = document.getElementById("majorInput").value;
-        // 这里可以集成调用 API 或展示静态数据
-        document.getElementById("result").innerText = `${major} 的就业前景很不错！`;
+    <div id="result" class="empty">
+      请输入一个专业名称开始查询。
+    </div>
+  </div>
+
+  <script>
+    let majorsData = [];
+
+    async function loadMajors() {
+      try {
+        const response = await fetch("./majors.json");
+        majorsData = await response.json();
+      } catch (error) {
+        document.getElementById("result").innerHTML = `
+          <div class="empty">
+            数据加载失败，请确认 majors.json 文件是否和 index.html 放在同一文件夹中。
+          </div>
+        `;
       }
-    </script>
+    }
+
+    function renderTags(items) {
+      return items.map(item => `<span class="tag">${item}</span>`).join("");
+    }
+
+    function searchMajor() {
+      const input = document.getElementById("majorInput").value.trim();
+      const result = document.getElementById("result");
+
+      if (!input) {
+        result.innerHTML = `<div class="empty">请先输入一个专业名称。</div>`;
+        return;
+      }
+
+      const results = majorsData.filter(item =>
+        item.name.includes(input)
+      );
+
+      if (results.length > 0) {
+  result.innerHTML = results.map(found => `
+    <div class="card" style="margin-bottom:20px;">
+      <h2>${found.name}</h2>
+      <div>
+        <span class="tag">专业代码：${found.code}</span>
+        <span class="tag">学科门类：${found.category}</span>
+      </div>
+
+      <div class="section-title">专业简介</div>
+      <div>${found.intro}</div>
+
+      <div class="section-title">常见岗位</div>
+      <div>${found.jobs.join("、")}</div>
+
+      <div class="section-title">就业前景</div>
+      <div>${found.prospect}</div>
+    </div>
+  `).join("");
+} else {
+  result.innerHTML = `
+    <div class="empty">
+      没找到相关专业，可以试试更简单的关键词，比如“计算机”“法”“设计”。
+    </div>
+  `;
+}
+    }
+
+    loadMajors();
+
+    document.getElementById("majorInput").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        searchMajor();
+      }
+    });
+  </script>
 </body>
 </html>
