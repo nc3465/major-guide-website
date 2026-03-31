@@ -292,6 +292,13 @@
       color: #4f9ecf;
     }
 
+    .suggestion-item.highlighted {
+      background-color: #e4f1f9;
+      color: #4f9ecf;
+      border-left: 3px solid #4f9ecf;
+      padding-left: 13px;
+    }
+
     .suggestion-item strong {
       color: #4f9ecf;
       font-weight: bold;
@@ -381,6 +388,13 @@
     .history-item:hover {
       background-color: #eef7fc;
       color: #4f9ecf;
+    }
+
+    .history-item.highlighted {
+      background-color: #e4f1f9;
+      color: #4f9ecf;
+      border-left: 3px solid #4f9ecf;
+      padding-left: 13px;
     }
 
     .history-delete-btn {
@@ -577,8 +591,14 @@
 
       if (history.length === 0) {
         historyBox.innerHTML = '<div class="history-empty">暂无搜索记录</div>';
+        currentHistoryIndex = -1;
+        currentHistoryItems = [];
         return;
       }
+
+      // Store current history items for keyboard navigation
+      currentHistoryItems = history;
+      currentHistoryIndex = -1;
 
       let html = `
         <div class="history-header">
@@ -587,8 +607,8 @@
         </div>
       `;
 
-      html += history.map(major => `
-        <div class="history-item" onclick="selectHistory('${major.replace(/'/g, "\\'")}')" style="cursor: pointer;">
+      html += history.map((major, index) => `
+        <div class="history-item" data-index="${index}" onclick="selectHistory('${major.replace(/'/g, "\\'")}')" style="cursor: pointer;">
           <span>${major}</span>
           <button class="history-delete-btn" onclick="event.stopPropagation(); removeHistoryItem('${major.replace(/'/g, "\\'")}')" style="cursor: pointer;">×</button>
         </div>
@@ -811,6 +831,8 @@
       if (!input.trim()) {
         suggestionBox.classList.remove('show');
         suggestionBox.innerHTML = '';
+        currentSuggestionIndex = -1;
+        currentSuggestions = [];
         return;
       }
 
@@ -832,18 +854,44 @@
       if (filtered.length === 0) {
         suggestionBox.classList.remove('show');
         suggestionBox.innerHTML = '';
+        currentSuggestionIndex = -1;
+        currentSuggestions = [];
         return;
       }
 
+      // Store current suggestions for keyboard navigation
+      currentSuggestions = filtered;
+      currentSuggestionIndex = -1;
+
       // Render suggestion items
-      suggestionBox.innerHTML = filtered.map(major => `
-        <div class="suggestion-item" onclick="selectSuggestion('${major.name.replace(/'/g, "\\'")}')">
+      suggestionBox.innerHTML = filtered.map((major, index) => `
+        <div class="suggestion-item" data-index="${index}" onclick="selectSuggestion('${major.name.replace(/'/g, "\\'")}')">
           ${highlightMatch(major.name, input)}
           <div class="suggestion-category">${major.category}</div>
         </div>
       `).join('');
 
       suggestionBox.classList.add('show');
+    }
+
+    // Highlight current suggestion
+    function highlightCurrentSuggestion() {
+      const items = document.querySelectorAll('.suggestion-item');
+      items.forEach(item => item.classList.remove('highlighted'));
+      
+      if (currentSuggestionIndex >= 0 && currentSuggestionIndex < items.length) {
+        items[currentSuggestionIndex].classList.add('highlighted');
+      }
+    }
+
+    // Highlight current history item
+    function highlightCurrentHistory() {
+      const items = document.querySelectorAll('.history-item');
+      items.forEach(item => item.classList.remove('highlighted'));
+      
+      if (currentHistoryIndex >= 0 && currentHistoryIndex < items.length) {
+        items[currentHistoryIndex].classList.add('highlighted');
+      }
     }
 
     // Handle suggestion item click
@@ -985,6 +1033,13 @@
 
     loadMajors();
 
+    // Track current highlighted suggestion
+    let currentSuggestionIndex = -1;
+    let currentSuggestions = [];
+    // Track current highlighted history
+    let currentHistoryIndex = -1;
+    let currentHistoryItems = [];
+
     // Suggestion box input listener
     document.getElementById("majorInput").addEventListener("input", function(event) {
       if (event.target.value.trim()) {
@@ -1009,8 +1064,42 @@
     document.addEventListener("click", hideSuggestionBox);
 
     document.getElementById("majorInput").addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        searchMajor();
+      const suggestionBox = document.getElementById('suggestion-box');
+      const historyBox = document.getElementById('history-box');
+      const isShowingSuggestions = suggestionBox.classList.contains('show');
+      const isShowingHistory = historyBox.classList.contains('show');
+      
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        if (isShowingSuggestions && currentSuggestions.length > 0) {
+          currentSuggestionIndex = Math.min(currentSuggestionIndex + 1, currentSuggestions.length - 1);
+          highlightCurrentSuggestion();
+        } else if (isShowingHistory && currentHistoryItems.length > 0) {
+          currentHistoryIndex = Math.min(currentHistoryIndex + 1, currentHistoryItems.length - 1);
+          highlightCurrentHistory();
+        }
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        if (isShowingSuggestions && currentSuggestions.length > 0) {
+          currentSuggestionIndex = Math.max(currentSuggestionIndex - 1, -1);
+          highlightCurrentSuggestion();
+        } else if (isShowingHistory && currentHistoryItems.length > 0) {
+          currentHistoryIndex = Math.max(currentHistoryIndex - 1, -1);
+          highlightCurrentHistory();
+        }
+      } else if (event.key === "Enter") {
+        if (isShowingSuggestions && currentSuggestionIndex >= 0 && currentSuggestions.length > 0) {
+          // Select highlighted suggestion
+          event.preventDefault();
+          selectSuggestion(currentSuggestions[currentSuggestionIndex].name);
+        } else if (isShowingHistory && currentHistoryIndex >= 0 && currentHistoryItems.length > 0) {
+          // Select highlighted history item
+          event.preventDefault();
+          selectHistory(currentHistoryItems[currentHistoryIndex]);
+        } else {
+          // Search with current input
+          searchMajor();
+        }
       }
     });
 
