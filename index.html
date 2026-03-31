@@ -17,7 +17,7 @@
     }
 
     .container {
-      max-width: 900px;
+      max-width: 960px;
       margin: 0 auto;
       padding: 40px 20px 60px;
     }
@@ -31,26 +31,27 @@
     .subtitle {
       text-align: center;
       color: #5b6b7a;
-      margin-bottom: 32px;
-      line-height: 1.6;
+      margin-bottom: 28px;
+      line-height: 1.7;
     }
 
     .search-box {
       display: flex;
       gap: 12px;
-      margin-bottom: 28px;
+      margin-bottom: 18px;
       flex-wrap: wrap;
       justify-content: center;
     }
 
     input {
-      width: 420px;
+      width: 440px;
       max-width: 100%;
       padding: 14px 16px;
       border: 1px solid #c9d8e6;
       border-radius: 12px;
       font-size: 16px;
       outline: none;
+      background: #fff;
     }
 
     input:focus {
@@ -66,6 +67,7 @@
       color: white;
       font-size: 16px;
       cursor: pointer;
+      transition: 0.2s ease;
     }
 
     button:hover {
@@ -77,6 +79,72 @@
       color: #7a8a99;
       margin-bottom: 20px;
       font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .recommend-panel {
+      background: white;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 8px 24px rgba(18, 60, 90, 0.08);
+      margin-bottom: 24px;
+    }
+
+    .recommend-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #133b5c;
+      margin-bottom: 8px;
+    }
+
+    .recommend-desc {
+      color: #6f7e8c;
+      font-size: 14px;
+      margin-bottom: 14px;
+      line-height: 1.7;
+    }
+
+    .recommend-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .pref-btn {
+      background: white;
+      color: #246b9a;
+      border: 1px solid #b9d5e8;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 14px;
+    }
+
+    .pref-btn:hover {
+      background: #eef7fc;
+    }
+
+    .pref-btn.active {
+      background: #4f9ecf;
+      color: white;
+      border-color: #4f9ecf;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .secondary-btn {
+      background: #eef7fc;
+      color: #246b9a;
+      border: 1px solid #cfe2ef;
+    }
+
+    .secondary-btn:hover {
+      background: #e4f1f9;
     }
 
     .card {
@@ -85,11 +153,13 @@
       padding: 28px;
       box-shadow: 0 8px 24px rgba(18, 60, 90, 0.08);
       line-height: 1.8;
+      margin-bottom: 20px;
     }
 
     .card h2 {
       margin-top: 0;
       color: #133b5c;
+      margin-bottom: 12px;
     }
 
     .tag {
@@ -104,7 +174,7 @@
     }
 
     .section-title {
-      margin-top: 20px;
+      margin-top: 18px;
       margin-bottom: 8px;
       font-weight: bold;
       color: #2d4b66;
@@ -117,10 +187,11 @@
       box-shadow: 0 8px 24px rgba(18, 60, 90, 0.08);
       text-align: center;
       color: #6d7b88;
+      line-height: 1.8;
     }
 
     .footer-note {
-      margin-top: 24px;
+      margin-top: 18px;
       font-size: 13px;
       color: #7a8a99;
       line-height: 1.7;
@@ -138,8 +209,13 @@
       }
 
       .card,
-      .empty {
+      .empty,
+      .recommend-panel {
         padding: 20px;
+      }
+
+      .action-row {
+        flex-direction: column;
       }
     }
   </style>
@@ -148,29 +224,53 @@
   <div class="container">
     <h1>志愿填报专业助手</h1>
     <p class="subtitle">
-      输入你想了解的专业名称，查看这个专业学什么、能做什么、就业前景如何。
+      输入专业名称，查看这个专业学什么、能做什么、就业前景如何；<br />
+      也可以直接按你的偏好，让系统为你推荐更适合的专业方向。
     </p>
 
     <div class="search-box">
       <input
         type="text"
         id="majorInput"
-        placeholder="例如：计算机科学与技术 / 法学 / 会计学"
+        placeholder="例如：计算机 / 法学 / 会计 / 视觉传达设计"
       />
       <button onclick="searchMajor()">查询专业</button>
     </div>
 
     <div class="tips">
-      可尝试搜索：计算机科学与技术、法学、金融学、临床医学、视觉传达设计
+      可尝试搜索：计算机、法、金融、医学、设计、会计
+    </div>
+
+    <div class="recommend-panel">
+      <div class="recommend-title">不知道搜什么？先按偏好推荐专业</div>
+      <div class="recommend-desc">
+        选择几个你更看重的方向，比如“稳定就业”“高收入潜力”或“创意表达”，系统会为你推荐匹配度更高的专业。
+      </div>
+
+      <div class="recommend-box">
+        <button type="button" class="pref-btn" onclick="togglePreference(this, '逻辑分析')">逻辑分析</button>
+        <button type="button" class="pref-btn" onclick="togglePreference(this, '稳定就业')">稳定就业</button>
+        <button type="button" class="pref-btn" onclick="togglePreference(this, '高收入潜力')">高收入潜力</button>
+        <button type="button" class="pref-btn" onclick="togglePreference(this, '创意表达')">创意表达</button>
+        <button type="button" class="pref-btn" onclick="togglePreference(this, '与人沟通')">与人沟通</button>
+        <button type="button" class="pref-btn" onclick="togglePreference(this, '继续深造')">继续深造</button>
+        <button type="button" class="pref-btn" onclick="togglePreference(this, '技术导向')">技术导向</button>
+      </div>
+
+      <div class="action-row">
+        <button onclick="recommendMajors()">为我推荐专业</button>
+        <button class="secondary-btn" onclick="clearPreferences()">清空已选标签</button>
+      </div>
     </div>
 
     <div id="result" class="empty">
-      请输入一个专业名称开始查询。
+      请输入一个专业名称开始查询，或先选择上方偏好标签获取推荐。
     </div>
   </div>
 
   <script>
     let majorsData = [];
+    let selectedPreferences = [];
 
     async function loadMajors() {
       try {
@@ -179,7 +279,7 @@
       } catch (error) {
         document.getElementById("result").innerHTML = `
           <div class="empty">
-            数据加载失败，请确认 majors.json 文件是否和 index.html 放在同一文件夹中。
+            数据加载失败，请确认 majors.json 是否和 index.html 放在同一文件夹中。
           </div>
         `;
       }
@@ -187,6 +287,47 @@
 
     function renderTags(items) {
       return items.map(item => `<span class="tag">${item}</span>`).join("");
+    }
+
+    function renderMajorCard(found, extraTag = "") {
+      return `
+        <div class="card">
+          <h2>${found.name}</h2>
+          <div>
+            ${extraTag}
+            <span class="tag">专业代码：${found.code}</span>
+            <span class="tag">学科门类：${found.category}</span>
+          </div>
+
+          <div class="section-title">专业简介</div>
+          <div>${found.intro}</div>
+
+          <div class="section-title">常见岗位</div>
+          <div>${renderTags(found.jobs)}</div>
+
+          <div class="section-title">常见行业</div>
+          <div>${renderTags(found.industry)}</div>
+
+          <div class="section-title">专业特点</div>
+          <div>${renderTags(found.tags)}</div>
+
+          <div class="section-title">薪资参考</div>
+          <div>${found.salary}</div>
+
+          <div class="section-title">就业前景</div>
+          <div>${found.prospect}</div>
+
+          <div class="section-title">读研方向</div>
+          <div>${renderTags(found.postgraduate)}</div>
+
+          <div class="section-title">院校参考</div>
+          <div>${renderTags(found.schools)}</div>
+
+          <div class="footer-note">
+            注：当前页面为原型版本，薪资与前景信息为概括性说明，实际情况会受城市、学历、院校、岗位和行业变化影响。
+          </div>
+        </div>
+      `;
     }
 
     function searchMajor() {
@@ -198,36 +339,69 @@
         return;
       }
 
-      const results = majorsData.filter(item =>
-        item.name.includes(input)
-      );
+      const results = majorsData.filter(item => item.name.includes(input));
 
       if (results.length > 0) {
-  result.innerHTML = results.map(found => `
-    <div class="card" style="margin-bottom:20px;">
-      <h2>${found.name}</h2>
-      <div>
-        <span class="tag">专业代码：${found.code}</span>
-        <span class="tag">学科门类：${found.category}</span>
-      </div>
+        result.innerHTML = results.map(found => renderMajorCard(found)).join("");
+      } else {
+        result.innerHTML = `
+          <div class="empty">
+            暂时没有找到“${input}”这个专业的数据。<br />
+            你可以先试试：计算机、法、金融、会计、设计、医学。
+          </div>
+        `;
+      }
+    }
 
-      <div class="section-title">专业简介</div>
-      <div>${found.intro}</div>
+    function togglePreference(button, tag) {
+      if (selectedPreferences.includes(tag)) {
+        selectedPreferences = selectedPreferences.filter(item => item !== tag);
+        button.classList.remove("active");
+      } else {
+        selectedPreferences.push(tag);
+        button.classList.add("active");
+      }
+    }
 
-      <div class="section-title">常见岗位</div>
-      <div>${found.jobs.join("、")}</div>
+    function clearPreferences() {
+      selectedPreferences = [];
+      document.querySelectorAll(".pref-btn").forEach(btn => {
+        btn.classList.remove("active");
+      });
+    }
 
-      <div class="section-title">就业前景</div>
-      <div>${found.prospect}</div>
-    </div>
-  `).join("");
-} else {
-  result.innerHTML = `
-    <div class="empty">
-      没找到相关专业，可以试试更简单的关键词，比如“计算机”“法”“设计”。
-    </div>
-  `;
-}
+    function recommendMajors() {
+      const result = document.getElementById("result");
+
+      if (selectedPreferences.length === 0) {
+        result.innerHTML = `<div class="empty">请先选择至少一个偏好标签。</div>`;
+        return;
+      }
+
+      const ranked = majorsData
+        .map(major => {
+          const matchCount = major.tags
+            ? major.tags.filter(tag => selectedPreferences.includes(tag)).length
+            : 0;
+          return { ...major, matchCount };
+        })
+        .filter(major => major.matchCount > 0)
+        .sort((a, b) => b.matchCount - a.matchCount)
+        .slice(0, 3);
+
+      if (ranked.length === 0) {
+        result.innerHTML = `<div class="empty">暂时没有匹配这些偏好的专业。</div>`;
+        return;
+      }
+
+      result.innerHTML = ranked
+        .map(found =>
+          renderMajorCard(
+            found,
+            `<span class="tag">匹配度：${found.matchCount} / ${selectedPreferences.length}</span>`
+          )
+        )
+        .join("");
     }
 
     loadMajors();
