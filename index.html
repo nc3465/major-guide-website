@@ -239,6 +239,176 @@
       }
     }
 
+    /* Suggestion box styles */
+    .search-box {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+    }
+
+    #suggestion-box {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: white;
+      border: 1px solid #c9d8e6;
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 8px 20px rgba(18, 60, 90, 0.1);
+      z-index: 1000;
+      display: none;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 0;
+    }
+
+    #suggestion-box.show {
+      display: block;
+      animation: slideDown 0.2s ease;
+    }
+
+    .suggestion-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 16px;
+      color: #1f2d3d;
+      border-bottom: 1px solid #eef2f7;
+      transition: background-color 0.15s ease;
+    }
+
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+
+    .suggestion-item:hover {
+      background-color: #eef7fc;
+      color: #4f9ecf;
+    }
+
+    .suggestion-item strong {
+      color: #4f9ecf;
+      font-weight: bold;
+    }
+
+    .suggestion-category {
+      font-size: 12px;
+      color: #7a8a99;
+      margin-top: 4px;
+    }
+
+    /* History box styles */
+    #history-box {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: white;
+      border: 1px solid #c9d8e6;
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 8px 20px rgba(18, 60, 90, 0.1);
+      z-index: 1000;
+      display: none;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 0;
+    }
+
+    #history-box.show {
+      display: block;
+      animation: slideDown 0.2s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .history-header {
+      padding: 10px 16px;
+      font-size: 12px;
+      color: #7a8a99;
+      font-weight: bold;
+      border-bottom: 1px solid #eef2f7;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .history-clear-btn {
+      font-size: 12px;
+      color: #4f9ecf;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0 4px;
+      transition: color 0.2s ease;
+    }
+
+    .history-clear-btn:hover {
+      color: #246b9a;
+    }
+
+    .history-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 16px;
+      color: #1f2d3d;
+      border-bottom: 1px solid #eef2f7;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.15s ease;
+    }
+
+    .history-item:last-child {
+      border-bottom: none;
+    }
+
+    .history-item:hover {
+      background-color: #eef7fc;
+      color: #4f9ecf;
+    }
+
+    .history-delete-btn {
+      font-size: 12px;
+      color: #9da8b3;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px 8px;
+      transition: color 0.2s ease;
+      opacity: 0;
+    }
+
+    .history-item:hover .history-delete-btn {
+      opacity: 1;
+    }
+
+    .history-delete-btn:hover {
+      color: #e53935;
+    }
+
+    .history-empty {
+      padding: 12px 16px;
+      text-align: center;
+      color: #7a8a99;
+      font-size: 14px;
+    }
+
     @media (max-width: 600px) {
       .search-box,
       .compare-box,
@@ -247,8 +417,16 @@
         align-items: stretch;
       }
 
+      .search-input-wrapper {
+        width: 100%;
+      }
+
       input,
       button {
+        width: 100%;
+      }
+
+      #suggestion-box {
         width: 100%;
       }
 
@@ -275,11 +453,15 @@
       </div>
 
       <div class="search-box">
-        <input
-          type="text"
-          id="majorInput"
-          placeholder="例如：计算机 / 法学 / 会计 / 视觉传达设计"
-        />
+        <div class="search-input-wrapper">
+          <input
+            type="text"
+            id="majorInput"
+            placeholder="例如：计算机 / 法学 / 会计 / 视觉传达设计"
+          />
+          <div id="suggestion-box"></div>
+          <div id="history-box"></div>
+        </div>
         <button onclick="searchMajor()">查询专业</button>
       </div>
 
@@ -331,6 +513,9 @@
   <script>
     let majorsData = [];
     let selectedPreferences = [];
+    let suggestionBoxPosition = null;
+    const HISTORY_KEY = 'majorSearchHistory';
+    const MAX_HISTORY = 10;
 
     async function loadMajors() {
       try {
@@ -347,6 +532,94 @@
 
     function renderTags(items = []) {
       return items.map(item => `<span class="tag">${item}</span>`).join("");
+    }
+
+    // Add search record to history
+    function addToHistory(majorName) {
+      let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+      
+      // Remove if already exists (to avoid duplicates)
+      history = history.filter(item => item !== majorName);
+      
+      // Add to the beginning
+      history.unshift(majorName);
+      
+      // Keep only the latest MAX_HISTORY items
+      history = history.slice(0, MAX_HISTORY);
+      
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    }
+
+    // Get search history
+    function getHistory() {
+      return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    }
+
+    // Clear all history
+    function clearHistory() {
+      localStorage.removeItem(HISTORY_KEY);
+      hideHistoryBox();
+    }
+
+    // Remove single history item
+    function removeHistoryItem(majorName) {
+      let history = getHistory();
+      history = history.filter(item => item !== majorName);
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+      renderHistoryBox();
+    }
+
+    // Render history box
+    function renderHistoryBox() {
+      const historyBox = document.getElementById('history-box');
+      const history = getHistory();
+
+      if (history.length === 0) {
+        historyBox.innerHTML = '<div class="history-empty">暂无搜索记录</div>';
+        return;
+      }
+
+      let html = `
+        <div class="history-header">
+          <span>搜索历史</span>
+          <button class="history-clear-btn" onclick="clearHistory()">清空</button>
+        </div>
+      `;
+
+      html += history.map(major => `
+        <div class="history-item" onclick="selectHistory('${major.replace(/'/g, "\\'")}')" style="cursor: pointer;">
+          <span>${major}</span>
+          <button class="history-delete-btn" onclick="event.stopPropagation(); removeHistoryItem('${major.replace(/'/g, "\\'")}')" style="cursor: pointer;">×</button>
+        </div>
+      `).join('');
+
+      historyBox.innerHTML = html;
+    }
+
+    // Show history box
+    function showHistoryBox() {
+      const historyBox = document.getElementById('history-box');
+      const history = getHistory();
+      
+      if (history.length === 0) {
+        historyBox.classList.remove('show');
+        return;
+      }
+
+      renderHistoryBox();
+      historyBox.classList.add('show');
+    }
+
+    // Hide history box
+    function hideHistoryBox() {
+      document.getElementById('history-box').classList.remove('show');
+    }
+
+    // Select from history
+    function selectHistory(majorName) {
+      document.getElementById('majorInput').value = majorName;
+      hideHistoryBox();
+      document.getElementById('suggestion-box').classList.remove('show');
     }
 
     function renderMajorCard(found, extraTag = "") {
@@ -412,14 +685,25 @@
 
       if (results.length > 0) {
         result.innerHTML = results.map(found => renderMajorCard(found)).join("");
+        addToHistory(input); // Add to history when search is successful
       } else {
         result.innerHTML = `
           <div class="empty">
-            暂时没有找到“${input}”这个专业的数据。<br />
+            暂时没有找到"${input}"这个专业的数据。<br />
             你可以先试试：计算机、法、金融、会计、设计、医学。
           </div>
         `;
       }
+      hideSuggestionBox();
+      
+      // Auto scroll to result
+      setTimeout(() => {
+        const elementPosition = result.getBoundingClientRect().top + window.scrollY - 100;
+        window.scrollTo({
+          top: elementPosition,
+          behavior: 'smooth'
+        });
+      }, 100);
     }
 
     function togglePreference(button, tag) {
@@ -471,10 +755,119 @@
           )
         )
         .join("");
+      
+      // Auto scroll to result
+      setTimeout(() => {
+        const elementPosition = result.getBoundingClientRect().top + window.scrollY - 100;
+        window.scrollTo({
+          top: elementPosition,
+          behavior: 'smooth'
+        });
+      }, 100);
     }
 
     function findMajorByInput(input) {
       return majorsData.find(item => item.name.includes(input));
+    }
+
+    // Fuzzy match helper: checks if input characters appear sequentially in text
+    function fuzzyMatch(input, text) {
+      let inputIdx = 0;
+      let textIdx = 0;
+      
+      while (inputIdx < input.length && textIdx < text.length) {
+        if (input[inputIdx].toLowerCase() === text[textIdx].toLowerCase()) {
+          inputIdx++;
+        }
+        textIdx++;
+      }
+      
+      return inputIdx === input.length;
+    }
+
+    // Highlight matched characters in the suggestion item
+    function highlightMatch(text, input) {
+      let result = '';
+      let inputIdx = 0;
+      
+      for (let i = 0; i < text.length; i++) {
+        if (inputIdx < input.length && text[i].toLowerCase() === input[inputIdx].toLowerCase()) {
+          result += `<strong>${text[i]}</strong>`;
+          inputIdx++;
+        } else {
+          result += text[i];
+        }
+      }
+      
+      return result;
+    }
+
+    // Render suggestions based on user input
+    function renderSuggestions(input) {
+      const suggestionBox = document.getElementById('suggestion-box');
+      
+      if (!input.trim()) {
+        suggestionBox.classList.remove('show');
+        suggestionBox.innerHTML = '';
+        return;
+      }
+
+      // Filter majors: match name or category, using both substring and fuzzy matching
+      const filtered = majorsData.filter(major => {
+        const inputLower = input.toLowerCase();
+        const nameLower = major.name.toLowerCase();
+        const categoryLower = major.category.toLowerCase();
+        
+        // Prioritize substring matches (exact contains)
+        if (nameLower.includes(inputLower) || categoryLower.includes(inputLower)) {
+          return true;
+        }
+        
+        // Fall back to fuzzy matching
+        return fuzzyMatch(input, major.name) || fuzzyMatch(input, major.category);
+      }).slice(0, 5); // Max 5 results
+
+      if (filtered.length === 0) {
+        suggestionBox.classList.remove('show');
+        suggestionBox.innerHTML = '';
+        return;
+      }
+
+      // Render suggestion items
+      suggestionBox.innerHTML = filtered.map(major => `
+        <div class="suggestion-item" onclick="selectSuggestion('${major.name.replace(/'/g, "\\'")}')">
+          ${highlightMatch(major.name, input)}
+          <div class="suggestion-category">${major.category}</div>
+        </div>
+      `).join('');
+
+      suggestionBox.classList.add('show');
+    }
+
+    // Handle suggestion item click
+    function selectSuggestion(majorName) {
+      document.getElementById('majorInput').value = majorName;
+      document.getElementById('suggestion-box').classList.remove('show');
+    }
+
+    // Hide suggestion box when clicking outside
+    function hideSuggestionBox(event) {
+      const suggestionBox = document.getElementById('suggestion-box');
+      const historyBox = document.getElementById('history-box');
+      const majorInput = document.getElementById('majorInput');
+      
+      // If no event is provided, simply hide both boxes
+      if (!event) {
+        suggestionBox.classList.remove('show');
+        historyBox.classList.remove('show');
+        return;
+      }
+      
+      // If event exists, only hide when clicking outside
+      if (!majorInput.contains(event.target) && !suggestionBox.contains(event.target) && !historyBox.contains(event.target)) {
+        suggestionBox.classList.remove('show');
+        historyBox.classList.remove('show');
+      }
     }
 
     function generateComparisonConclusion(major1, major2) {
@@ -576,9 +969,41 @@
           </div>
         </div>
       `;
+      
+      // Auto scroll to result
+      setTimeout(() => {
+        const elementPosition = result.getBoundingClientRect().top + window.scrollY - 100;
+        window.scrollTo({
+          top: elementPosition,
+          behavior: 'smooth'
+        });
+      }, 100);
     }
 
     loadMajors();
+
+    // Suggestion box input listener
+    document.getElementById("majorInput").addEventListener("input", function(event) {
+      if (event.target.value.trim()) {
+        renderSuggestions(event.target.value);
+        hideHistoryBox();
+      } else {
+        document.getElementById('suggestion-box').classList.remove('show');
+        showHistoryBox();
+      }
+    });
+
+    // Show history when input is focused and empty
+    document.getElementById("majorInput").addEventListener("focus", function(event) {
+      if (!event.target.value.trim()) {
+        showHistoryBox();
+      }
+    });
+
+
+
+    // Global click listener for dismissing suggestions
+    document.addEventListener("click", hideSuggestionBox);
 
     document.getElementById("majorInput").addEventListener("keydown", function(event) {
       if (event.key === "Enter") {
