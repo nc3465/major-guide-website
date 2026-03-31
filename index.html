@@ -17,7 +17,7 @@
     }
 
     .container {
-      max-width: 960px;
+      max-width: 1080px;
       margin: 0 auto;
       padding: 40px 20px 60px;
     }
@@ -32,10 +32,11 @@
       text-align: center;
       color: #5b6b7a;
       margin-bottom: 28px;
-      line-height: 1.7;
+      line-height: 1.8;
     }
 
-    .search-box {
+    .search-box,
+    .compare-box {
       display: flex;
       gap: 12px;
       margin-bottom: 18px;
@@ -44,7 +45,7 @@
     }
 
     input {
-      width: 440px;
+      width: 320px;
       max-width: 100%;
       padding: 14px 16px;
       border: 1px solid #c9d8e6;
@@ -74,6 +75,16 @@
       background: #3f8fbe;
     }
 
+    .secondary-btn {
+      background: #eef7fc;
+      color: #246b9a;
+      border: 1px solid #cfe2ef;
+    }
+
+    .secondary-btn:hover {
+      background: #e4f1f9;
+    }
+
     .tips {
       text-align: center;
       color: #7a8a99;
@@ -82,7 +93,7 @@
       line-height: 1.7;
     }
 
-    .recommend-panel {
+    .panel {
       background: white;
       border-radius: 18px;
       padding: 22px;
@@ -90,14 +101,14 @@
       margin-bottom: 24px;
     }
 
-    .recommend-title {
+    .panel-title {
       font-size: 18px;
       font-weight: bold;
       color: #133b5c;
       margin-bottom: 8px;
     }
 
-    .recommend-desc {
+    .panel-desc {
       color: #6f7e8c;
       font-size: 14px;
       margin-bottom: 14px;
@@ -137,22 +148,12 @@
       flex-wrap: wrap;
     }
 
-    .secondary-btn {
-      background: #eef7fc;
-      color: #246b9a;
-      border: 1px solid #cfe2ef;
-    }
-
-    .secondary-btn:hover {
-      background: #e4f1f9;
-    }
-
     .card {
       background: white;
       border-radius: 18px;
       padding: 28px;
       box-shadow: 0 8px 24px rgba(18, 60, 90, 0.08);
-      line-height: 1.8;
+      line-height: 1.85;
       margin-bottom: 20px;
     }
 
@@ -174,7 +175,7 @@
     }
 
     .section-title {
-      margin-top: 18px;
+      margin-top: 20px;
       margin-bottom: 8px;
       font-weight: bold;
       color: #2d4b66;
@@ -197,8 +198,51 @@
       line-height: 1.7;
     }
 
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 180px 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+      align-items: start;
+    }
+
+    .compare-cell {
+      background: #f8fbfd;
+      border: 1px solid #e3eef5;
+      border-radius: 14px;
+      padding: 14px;
+      min-height: 100%;
+    }
+
+    .compare-label {
+      font-weight: bold;
+      color: #2d4b66;
+      background: #eef7fc;
+    }
+
+    .decision-box {
+      background: #f3f9fd;
+      border: 1px solid #d7eaf5;
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 12px;
+      color: #244b66;
+    }
+
+    @media (max-width: 800px) {
+      .compare-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .compare-label {
+        margin-top: 8px;
+      }
+    }
+
     @media (max-width: 600px) {
-      .search-box {
+      .search-box,
+      .compare-box,
+      .action-row {
         flex-direction: column;
         align-items: stretch;
       }
@@ -210,12 +254,8 @@
 
       .card,
       .empty,
-      .recommend-panel {
+      .panel {
         padding: 20px;
-      }
-
-      .action-row {
-        flex-direction: column;
       }
     }
   </style>
@@ -224,27 +264,34 @@
   <div class="container">
     <h1>志愿填报专业助手</h1>
     <p class="subtitle">
-      输入专业名称，查看这个专业学什么、能做什么、就业前景如何；<br />
-      也可以直接按你的偏好，让系统为你推荐更适合的专业方向。
+      不只是告诉你“这个专业学什么”，<br />
+      更希望帮助你理解：这个专业可能会把你带向怎样的人生。
     </p>
 
-    <div class="search-box">
-      <input
-        type="text"
-        id="majorInput"
-        placeholder="例如：计算机 / 法学 / 会计 / 视觉传达设计"
-      />
-      <button onclick="searchMajor()">查询专业</button>
+    <div class="panel">
+      <div class="panel-title">搜索专业</div>
+      <div class="panel-desc">
+        输入专业名称，了解这个专业学什么、未来做什么、适合什么样的人。
+      </div>
+
+      <div class="search-box">
+        <input
+          type="text"
+          id="majorInput"
+          placeholder="例如：计算机 / 法学 / 会计 / 视觉传达设计"
+        />
+        <button onclick="searchMajor()">查询专业</button>
+      </div>
+
+      <div class="tips">
+        可尝试搜索：计算机、法、金融、医学、设计、会计
+      </div>
     </div>
 
-    <div class="tips">
-      可尝试搜索：计算机、法、金融、医学、设计、会计
-    </div>
-
-    <div class="recommend-panel">
-      <div class="recommend-title">不知道搜什么？先按偏好推荐专业</div>
-      <div class="recommend-desc">
-        选择几个你更看重的方向，比如“稳定就业”“高收入潜力”或“创意表达”，系统会为你推荐匹配度更高的专业。
+    <div class="panel">
+      <div class="panel-title">按偏好推荐专业</div>
+      <div class="panel-desc">
+        如果你还不知道搜什么，可以先选几个你更看重的方向，系统会推荐更匹配的专业。
       </div>
 
       <div class="recommend-box">
@@ -263,8 +310,21 @@
       </div>
     </div>
 
+    <div class="panel">
+      <div class="panel-title">专业对比</div>
+      <div class="panel-desc">
+        如果你正在两个专业之间犹豫，可以直接对比它们的生活方式、发展路径和适合人群。
+      </div>
+
+      <div class="compare-box">
+        <input id="compare1" placeholder="输入专业A，例如：计算机" />
+        <input id="compare2" placeholder="输入专业B，例如：法学" />
+        <button onclick="compareMajors()">对比专业</button>
+      </div>
+    </div>
+
     <div id="result" class="empty">
-      请输入一个专业名称开始查询，或先选择上方偏好标签获取推荐。
+      请输入一个专业开始查询，或使用推荐 / 对比功能。
     </div>
   </div>
 
@@ -285,7 +345,7 @@
       }
     }
 
-    function renderTags(items) {
+    function renderTags(items = []) {
       return items.map(item => `<span class="tag">${item}</span>`).join("");
     }
 
@@ -299,8 +359,11 @@
             <span class="tag">学科门类：${found.category}</span>
           </div>
 
-          <div class="section-title">专业简介</div>
+          <div class="section-title">这个专业主要学什么</div>
           <div>${found.intro}</div>
+
+          <div class="section-title">你未来可能在过怎样的学习 / 工作生活</div>
+          <div>${found.day}</div>
 
           <div class="section-title">常见岗位</div>
           <div>${renderTags(found.jobs)}</div>
@@ -308,23 +371,29 @@
           <div class="section-title">常见行业</div>
           <div>${renderTags(found.industry)}</div>
 
-          <div class="section-title">专业特点</div>
-          <div>${renderTags(found.tags)}</div>
-
           <div class="section-title">薪资参考</div>
-          <div>${found.salary}</div>
+          <div>${found.salary_detail}</div>
 
-          <div class="section-title">就业前景</div>
+          <div class="section-title">未来发展方向</div>
           <div>${found.prospect}</div>
+
+          <div class="section-title">适合什么样的人</div>
+          <div>${found.suitable}</div>
+
+          <div class="section-title">你需要提前知道的现实</div>
+          <div>${found.risk}</div>
 
           <div class="section-title">读研方向</div>
           <div>${renderTags(found.postgraduate)}</div>
+
+          <div class="section-title">专业特点</div>
+          <div>${renderTags(found.tags)}</div>
 
           <div class="section-title">院校参考</div>
           <div>${renderTags(found.schools)}</div>
 
           <div class="footer-note">
-            注：当前页面为原型版本，薪资与前景信息为概括性说明，实际情况会受城市、学历、院校、岗位和行业变化影响。
+            注：当前页面为产品原型版本，薪资与发展路径为概括性参考，实际情况会受城市、学历、院校、行业、个人能力与机会影响。
           </div>
         </div>
       `;
@@ -404,11 +473,128 @@
         .join("");
     }
 
+    function findMajorByInput(input) {
+      return majorsData.find(item => item.name.includes(input));
+    }
+
+    function generateComparisonConclusion(major1, major2) {
+      if (major1.tags.includes("高收入潜力") && !major2.tags.includes("高收入潜力")) {
+        return `如果你更追求收入上限和更快的职业回报，${major1.name}通常会更吸引你；如果你更看重路径的秩序感、资格壁垒或长期稳定性，${major2.name}可能更适合。`;
+      }
+
+      if (major2.tags.includes("高收入潜力") && !major1.tags.includes("高收入潜力")) {
+        return `如果你更追求收入上限和更快的职业回报，${major2.name}通常会更吸引你；如果你更看重路径的秩序感、资格壁垒或长期稳定性，${major1.name}可能更适合。`;
+      }
+
+      if (major1.tags.includes("创意表达") && !major2.tags.includes("创意表达")) {
+        return `${major1.name}更偏向表达、审美和个人风格成长，${major2.name}则更偏向结构化路径。关键不在“哪个好”，而在于你更想过哪种生活。`;
+      }
+
+      if (major2.tags.includes("创意表达") && !major1.tags.includes("创意表达")) {
+        return `${major2.name}更偏向表达、审美和个人风格成长，${major1.name}则更偏向结构化路径。关键不在“哪个好”，而在于你更想过哪种生活。`;
+      }
+
+      return `${major1.name}和${major2.name}都可能通向不错的发展，但它们对应的日常状态、压力来源和成长方式不同。真正值得比较的，是哪一种人生更让你愿意长期投入。`;
+    }
+
+    function compareMajors() {
+      const input1 = document.getElementById("compare1").value.trim();
+      const input2 = document.getElementById("compare2").value.trim();
+      const result = document.getElementById("result");
+
+      if (!input1 || !input2) {
+        result.innerHTML = `<div class="empty">请先输入两个专业名称再进行对比。</div>`;
+        return;
+      }
+
+      const major1 = findMajorByInput(input1);
+      const major2 = findMajorByInput(input2);
+
+      if (!major1 || !major2) {
+        result.innerHTML = `<div class="empty">请输入两个有效专业名称，例如“计算机”和“法学”。</div>`;
+        return;
+      }
+
+      const conclusion = generateComparisonConclusion(major1, major2);
+
+      result.innerHTML = `
+        <div class="card">
+          <h2>专业对比：${major1.name} vs ${major2.name}</h2>
+
+          <div class="decision-box">
+            <strong>一句话建议：</strong>${conclusion}
+          </div>
+
+          <div class="section-title">对比总览</div>
+          <div class="compare-grid">
+            <div class="compare-cell compare-label">维度</div>
+            <div class="compare-cell"><strong>${major1.name}</strong></div>
+            <div class="compare-cell"><strong>${major2.name}</strong></div>
+
+            <div class="compare-cell compare-label">这个专业主要学什么</div>
+            <div class="compare-cell">${major1.intro}</div>
+            <div class="compare-cell">${major2.intro}</div>
+
+            <div class="compare-cell compare-label">你未来可能在过怎样的学习 / 工作生活</div>
+            <div class="compare-cell">${major1.day}</div>
+            <div class="compare-cell">${major2.day}</div>
+
+            <div class="compare-cell compare-label">常见岗位</div>
+            <div class="compare-cell">${major1.jobs.join("、")}</div>
+            <div class="compare-cell">${major2.jobs.join("、")}</div>
+
+            <div class="compare-cell compare-label">常见行业</div>
+            <div class="compare-cell">${major1.industry.join("、")}</div>
+            <div class="compare-cell">${major2.industry.join("、")}</div>
+
+            <div class="compare-cell compare-label">薪资参考</div>
+            <div class="compare-cell">${major1.salary_detail}</div>
+            <div class="compare-cell">${major2.salary_detail}</div>
+
+            <div class="compare-cell compare-label">未来发展方向</div>
+            <div class="compare-cell">${major1.prospect}</div>
+            <div class="compare-cell">${major2.prospect}</div>
+
+            <div class="compare-cell compare-label">适合什么样的人</div>
+            <div class="compare-cell">${major1.suitable}</div>
+            <div class="compare-cell">${major2.suitable}</div>
+
+            <div class="compare-cell compare-label">你需要提前知道的现实</div>
+            <div class="compare-cell">${major1.risk}</div>
+            <div class="compare-cell">${major2.risk}</div>
+
+            <div class="compare-cell compare-label">专业特点</div>
+            <div class="compare-cell">${renderTags(major1.tags)}</div>
+            <div class="compare-cell">${renderTags(major2.tags)}</div>
+          </div>
+
+          <div class="section-title">怎么选更适合你</div>
+          <div>
+            如果你读到 <strong>${major1.name}</strong> 的描述时，会觉得“虽然辛苦，但我愿意过这样的日子”，那它就有可能更适合你。<br /><br />
+            如果你读到 <strong>${major2.name}</strong> 的描述时，会觉得“这条路虽然不轻松，但我能接受它的训练方式和成长节奏”，那它也许就是更合适的方向。<br /><br />
+            真正重要的不是哪个更“体面”，而是哪一个更让你愿意长期投入。
+          </div>
+        </div>
+      `;
+    }
+
     loadMajors();
 
     document.getElementById("majorInput").addEventListener("keydown", function(event) {
       if (event.key === "Enter") {
         searchMajor();
+      }
+    });
+
+    document.getElementById("compare1").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        compareMajors();
+      }
+    });
+
+    document.getElementById("compare2").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        compareMajors();
       }
     });
   </script>
