@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大学专业与就业前景</title>
+</head>
+<body>
+    <h1>欢迎来到大学专业信息平台</h1>
+    <p>这里可以帮助你了解各类大学专业的薪资与就业前景。</p>
+
+    <input type="text" id="majorInput" placeholder="输入专业名...">
+    <button onclick="searchMajor()">查询专业</button>
+
+    <div id="result"></div>
+
+    <script>
+      function searchMajor() {
+        const major = document.getElementById("majorInput").value;
+        // 这里可以集成调用 API 或展示静态数据
+        document.getElementById("result").innerText = `${major} 的就业前景很不错！`;
+      }
+    </script>
+</body>
+</html>
